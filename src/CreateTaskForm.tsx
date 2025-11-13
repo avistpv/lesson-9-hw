@@ -1,33 +1,11 @@
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {z} from 'zod';
 import './CreateTaskForm.css';
 import {createTask, type CreateTaskData} from './utilities';
+import {taskFormSchema, type TaskFormData} from './taskFormSchema';
 
-const taskFormSchema = z.object({
-    name: z.string().min(1, 'Task name is required'),
-    description: z.string().min(1, 'Description is required'),
-    status: z.enum(['pending', 'in-progress', 'completed']),
-    priority: z.enum(['low', 'medium', 'high']),
-    deadline: z.string().optional().refine(
-        (date) => {
-            if (!date) return true;
-            const selectedDate = new Date(date);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            selectedDate.setHours(0, 0, 0, 0);
-            return selectedDate >= today;
-        },
-        {
-            message: 'Deadline cannot be in the past',
-        }
-    ),
-});
-
-type TaskFormData = z.infer<typeof taskFormSchema>;
-
-const CreateTaskForm: React.FC = () => {
+const CreateTaskForm = () => {
     const [isSuccess, setIsSuccess] = useState(false);
 
     const {
@@ -52,6 +30,7 @@ const CreateTaskForm: React.FC = () => {
                 description: data.description,
                 status: data.status,
                 priority: data.priority,
+                deadline: data.deadline,
             };
 
             await createTask(taskData);
